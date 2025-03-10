@@ -4,7 +4,7 @@ let running = 1
 const body = {
     floor: 1,
     position: 2,
-    qty: 3
+    qty: 3,
     b:1,
 }
 
