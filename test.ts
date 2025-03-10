@@ -32,7 +32,7 @@ const server = net.createServer((socket) => {
         const newQty = pad(body.qty, 4);
         const newMachine= pad(body.b,2)
         running = running > 9 ? 1 : running;
-        const sumValue = body.b + body.floor + body.position+body.qty+1+0+running + 4500;
+        const sumValue = body.b + body.floor + body.position+body.qty+1+1+0+running + 4500;
         console.log('sum is ',sumValue)
         const sum = pad(sumValue, 2).slice(-2);
         const message = `B${newMachine}R${newFloor}C${newPosition}Q${newQty}L01M01T00N${running}D4500S${sum}`;
