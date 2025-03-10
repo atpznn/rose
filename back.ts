@@ -83,26 +83,26 @@ function sendToTCPServer(data: string) {
     client.write(data);
 }
 
-// socket 
-const server = net.createServer((socket) => {
-    console.log('🔗 Client connected:', socket.remoteAddress, socket.remotePort);
+// // socket 
+// const server = net.createServer((socket) => {
+//     console.log('🔗 Client connected:', socket.remoteAddress, socket.remotePort);
 
-    socket.on('data', (data) => {
-        console.log('📥 Received from PLC:', data.toString());
-    });
+//     socket.on('data', (data) => {
+//         console.log('📥 Received from PLC:', data.toString());
+//     });
 
-    socket.on('end', () => {
-        console.log('❌ Client disconnected');
-    });
+//     socket.on('end', () => {
+//         console.log('❌ Client disconnected');
+//     });
 
-    socket.on('error', (err) => {
-        console.error('⚠️ Error:', err.message);
-    });
-});
+//     socket.on('error', (err) => {
+//         console.error('⚠️ Error:', err.message);
+//     });
+// });
 
-server.listen(2001, () => {
-    console.log('🚀 TCP Server กำลังทำงานที่ 2001');
-});
+// server.listen(2001, () => {
+//     console.log('🚀 TCP Server กำลังทำงานที่ 2001');
+// });
 
 const port = 3000;
 app.listen(port, () => {
