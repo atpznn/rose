@@ -8,7 +8,7 @@ const portSocket = 3001
 function main() {
     // for plc
     const plc = plcServer()
-    plc.startPlcServer({ port: portPlc, host: 'localhost' })
+    plc.startPlcServer({ port: portPlc })
 
     // for react 
     const api = expressServer(plc)

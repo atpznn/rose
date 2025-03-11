@@ -25,7 +25,7 @@ function SocketIoServer() {
             io = createSocketServer();
             io.listen(port)
             io.httpServer.on('listening', () => {
-                console.log(`Socket.IO server is running on port ${port}`);
+                console.log(`🚀 React Socket Server started on port :${port}`);
             });
 
             console.log('start socket io');

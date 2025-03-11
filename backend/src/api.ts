@@ -40,7 +40,7 @@ function expressServer(plcServer: PlcServer) {
             app.use(cors());
             initRoute(app)
             app.listen(port, () => {
-                console.log(`🚀 API server running on http://localhost:${port}`);
+                console.log(`🚀 API server running on port : ${port}`);
             });
         }
         catch (ex) {

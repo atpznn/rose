@@ -45,7 +45,7 @@ function plcServer() {
         });
 
         server.listen(port, () => {
-            console.log(`🚀 PLC Server started on port ${port}`);
+            console.log(`🚀 PLC Server started on port : ${port}`);
         });
 
         server.on('error', (err) => {
