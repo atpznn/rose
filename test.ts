@@ -1,6 +1,6 @@
-import express from 'express';
+import express from './backend/node_modules/@types/express';
 import net from 'net';
-import cors from 'cors';
+import cors from './backend/node_modules/@types/cors';
 
 const app = express();
 app.use(cors());
