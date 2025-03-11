@@ -22,7 +22,6 @@ function SocketIoServer() {
     function startSocketIo(port: number) {
         io = createSocketServer();
         io.listen(port)
-        // เช็คว่าเซิร์ฟเวอร์เริ่มทำงานสำเร็จหรือไม่
         io.httpServer.on('listening', () => {
             console.log(`Socket.IO server is running on port ${port}`);
         });

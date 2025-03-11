@@ -49,12 +49,11 @@ function plcServer() {
     }
 
     function startPlcServer({ port, host }: { port: number, host: string }) {
-        return
-        // client = createPlcServer()
-        // client.connect(port, host, () => {
-        //     console.log('Connected to PLC server');
-        // });
-        // initEvent(client)
+        client = createPlcServer()
+        client.connect(port, host, () => {
+            console.log('Connected to PLC server');
+        });
+        initEvent(client)
     }
     function sendToTCPServer(data: string) {
         if (!client) return
