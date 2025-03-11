@@ -20,24 +20,30 @@ function SocketIoServer() {
     }
 
     function startSocketIo(port: number) {
-        io = createSocketServer();
-        io.listen(port)
-        io.httpServer.on('listening', () => {
-            console.log(`Socket.IO server is running on port ${port}`);
-        });
+        try {
 
-        console.log('start socket io');
+            io = createSocketServer();
+            io.listen(port)
+            io.httpServer.on('listening', () => {
+                console.log(`Socket.IO server is running on port ${port}`);
+            });
 
-        io.on('connection', (socket) => {
-            console.log('A user connected:', socket.id);
-            socket.emit('message', 'Hello from server');
-            socket.on('clientMessage', (data) => {
-                console.log('Message from client:', data);
+            console.log('start socket io');
+
+            io.on('connection', (socket) => {
+                console.log('A user connected:', socket.id);
+                socket.emit('message', 'Hello from server');
+                socket.on('clientMessage', (data) => {
+                    console.log('Message from client:', data);
+                });
+                socket.on('disconnect', () => {
+                    console.log('A user disconnected');
+                });
             });
-            socket.on('disconnect', () => {
-                console.log('A user disconnected');
-            });
-        });
+        }
+        catch (ex) {
+            console.log('error socket server', ex)
+        }
     }
 
     return {

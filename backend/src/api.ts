@@ -34,13 +34,18 @@ function expressServer(plcServer: PlcServer) {
         });
     }
     function startServer(port: number) {
-        app = createServer()
-        app.use(express.json());
-        app.use(cors());
-        initRoute(app)
-        app.listen(port, () => {
-            console.log(`🚀 API server running on http://localhost:${port}`);
-        });
+        try {
+            app = createServer()
+            app.use(express.json());
+            app.use(cors());
+            initRoute(app)
+            app.listen(port, () => {
+                console.log(`🚀 API server running on http://localhost:${port}`);
+            });
+        }
+        catch (ex) {
+            console.log('error Api Server', ex)
+        }
     }
     function getServer() {
         return app
