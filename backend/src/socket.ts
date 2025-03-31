@@ -1,4 +1,3 @@
-import express from 'express';
 import { Server as SocketIOServer } from 'socket.io';
 import http from 'http';
 
@@ -40,6 +39,7 @@ function SocketIoServer() {
                     console.log('A user disconnected');
                 });
             });
+            return io
         }
         catch (ex) {
             console.log('error socket server', ex)

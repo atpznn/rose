@@ -18,7 +18,7 @@ function expressServer(plcServer: PlcServer) {
         }
         app.get('/api/number_plc', (req, res) => {
             res.json({
-                allPlc: plcServer.getNumberOfPlc()
+                allPlc: plcServer.getNumberOfPlc().map(x => ({ floor: x.floor, position: x.position, isOnline: !!x.instance, req: x.req, res: x.res })) 
             })
         })
         app.post('/api/send', (req, res) => {
@@ -42,6 +42,7 @@ function expressServer(plcServer: PlcServer) {
             const sum = sumValue.toString().padStart(2, '0').slice(-2);
             const message = `B${String(body.container).padStart(2, '0')}R${String(body.floor).padStart(2, '0')}C${String(body.position).padStart(2, '0')}Q${String(body.qty).padStart(4, '0')}L01M01T00N${running}D4500S${sum}`;
             console.log('📤 Sending...', message);
+            plcServer.sendToPLC(floor, position, message)
             // const c = plcServer.sendToPLC(message);
 
             // if (c) {

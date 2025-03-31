@@ -1,10 +1,52 @@
 import * as net from 'net';
-interface Plc {
-    id: number
+import { Server, Socket } from 'socket.io';
+interface Plc extends PlcPayload {
+    instance: net.Socket | null
 }
-function plcServer() {
+interface PlcResponse extends PlcPayload {
+    isOnline: boolean,
+
+}
+interface PlcPayload {
+    floor: number
+    position: number
+    req: string,
+    res: string
+}
+const instancesDefault: Plc[] = [{
+    floor: 1,
+    position: 1,
+    instance: null,
+    req: '', res: ''
+},
+{
+    floor: 1,
+    position: 2,
+    instance: null,
+    req: '', res: ''
+},
+{
+    floor: 1,
+    position: 3,
+    instance: null,
+    req: '', res: ''
+}, {
+    floor: 2,
+    position: 1,
+    instance: null,
+    req: '', res: ''
+}, {
+    floor: 2,
+    position: 2,
+    instance: null,
+    req: '', res: ''
+}]
+const typeReq = {
+    Greeting: 'Greeting',
+    Res: 'Res'
+}
+function plcServer(socketIo: Server) {
     let server: net.Server | null = null;
-    let client: net.Socket | null = null;
     function getStatusT(status: string, qty?: string): string {
         console.log("Received Status Code:", status);
         switch (status) {
@@ -21,23 +63,47 @@ function plcServer() {
             default: return 'T00'; // ค่าเริ่มต้นหากไม่ตรงกับเงื่อนไขใด ๆ
         }
     }
-    let plcs: Plc[] = []
+
     function getNumberOfPlc() {
-        return plcs
+        return instancesDefault
     }
     function startPlcServer({ port }: { port: number }) {
         server = net.createServer((socket) => {
-            client = socket;
             console.log('📡 PLC Connected:', socket.remoteAddress, socket.remotePort);
-            plcs.push({
-                id: socket.remotePort!
-            });
+            socket.on('data', (data) => {
+                const __data = JSON.parse(data.toString()) as { type: string, data: unknown }
+                if (__data.type == typeReq.Greeting) {
+                    const _data = __data.data as { floor: number, position: number }
+                    const index = instancesDefault.findIndex(x => x.floor == _data.floor && x.position == _data.position)
+                    if (index < 0) {
+                        instancesDefault.push({
+                            position: _data.position,
+                            floor: _data.floor,
+                            req: '', res: '',
+                            instance: socket
+                        });
+                    }
+                    else {
+                        instancesDefault[index].instance = socket
+                    }
+                    socketIo.emit('plc-connect', { plc: instancesDefault.map<PlcPayload>(x => ({ floor: x.floor, position: x.position, isOnline: !!x.instance, req: '', res: '' })) })
 
+                }
+                else if (__data.type == typeReq.Res) {
+                    const _data = __data.data as { floor: number, position: number, res: string }
+                    const index = instancesDefault.findIndex(x => x.floor == _data.floor && x.position == _data.position)
+                    if (index >= 0) {
+                        instancesDefault[index].res = _data.res
+                        socketIo.emit('plc-res', { plc: instancesDefault.map<PlcPayload>(x => ({ floor: x.floor, position: x.position, isOnline: !!x.instance, req: x.req, res: x.res })) })
 
+                    }
+                }
+            })
             socket.on('close', () => {
                 console.log('❌ PLC Socket Closed');
-                const index = plcs.findIndex(x => x.id == socket.remotePort)
-                plcs.slice(index, 1)
+                const index = instancesDefault.findIndex(x => x.instance?.remotePort == socket.remotePort)
+                instancesDefault[index].instance = null
+                socketIo.emit('plc-disconnect', { plc: instancesDefault.map<PlcPayload>(x => ({ floor: x.floor, position: x.position, isOnline: !!x.instance, req: '', res: '' })) })
             });
 
             socket.on('error', (err) => {
@@ -59,13 +125,16 @@ function plcServer() {
     }
 
 
-    function sendToPLC(data: string) {
+    function sendToPLC(floor: number, position: number, data: string) {
+        const client = instancesDefault.find(x => x.floor == floor && x.position == position)
         if (!client) {
             console.log('⚠️ No PLC Connected');
             return;
         }
         console.log('📤 Sending to PLC:', data);
-        client.write(data);
+        client.instance?.write(data);
+        client.req = data
+        socketIo.emit('plc-res', { plc: instancesDefault.map<PlcPayload>(x => ({ floor: x.floor, position: x.position, isOnline: !!x.instance, req: x.req, res: 'รอสักครู่' })) })
     }
 
     return {
