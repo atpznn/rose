@@ -22,21 +22,22 @@ const InvestmentGrowthChart = () => {
   useEffect(() => {
     const newSocket = io("http://localhost:3001");
     setSocket(newSocket);
-    newSocket.on("connect", () => {
+    if (!socket) return;
+    socket.on("connect", () => {
       setIsSocketConnected(true); // เชื่อมต่อสำเร็จ
     });
 
-    newSocket.on("disconnect", () => {
+    socket.on("disconnect", () => {
       setIsSocketConnected(false); // การเชื่อมต่อถูกตัด
     });
 
-    newSocket.on("plc-connect", ({ plc }: { plc: Plc[] }) => {
+    socket.on("plc-connect", ({ plc }: { plc: Plc[] }) => {
       setPlcs(plc.map((x) => ({ ...x, qty: 0 })));
     });
-    newSocket.on("plc-disconnect", ({ plc }: { plc: Plc[] }) => {
+    socket.on("plc-disconnect", ({ plc }: { plc: Plc[] }) => {
       setPlcs(plc.map((x) => ({ ...x, qty: 0 })));
     });
-    newSocket.on("plc-res", ({ plc }: { plc: Plc[] }) => {
+    socket.on("plc-res", ({ plc }: { plc: Plc[] }) => {
       setPlcs(plc.map((x) => ({ ...x, qty: 0 })));
     });
     return () => {
