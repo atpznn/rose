@@ -1,10 +1,9 @@
 import { expressServer } from './api'
 import { plcServer } from './plc'
 import { SocketIoServer } from './socket'
-const portApi = 3000
+const portApi = 3005
 const portPlc = 2001
 const portSocket = 3001
-
 function main() {
     // for plc
     const plc = plcServer()
@@ -17,5 +16,6 @@ function main() {
     // for react 
     const socketIo = SocketIoServer()
     socketIo.startSocketIo(portSocket)
+    // mockPlcConnection(portPlc)
 }
 main()

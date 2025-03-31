@@ -1,9 +1,10 @@
 import * as net from 'net';
-
+interface Plc {
+    id: number
+}
 function plcServer() {
     let server: net.Server | null = null;
     let client: net.Socket | null = null;
-
     function getStatusT(status: string, qty?: string): string {
         console.log("Received Status Code:", status);
         switch (status) {
@@ -20,23 +21,23 @@ function plcServer() {
             default: return 'T00'; // ค่าเริ่มต้นหากไม่ตรงกับเงื่อนไขใด ๆ
         }
     }
-
+    let plcs: Plc[] = []
+    function getNumberOfPlc() {
+        return plcs
+    }
     function startPlcServer({ port }: { port: number }) {
         server = net.createServer((socket) => {
             client = socket;
             console.log('📡 PLC Connected:', socket.remoteAddress, socket.remotePort);
-
-            socket.on('data', (data) => {
-                console.log('📥 Received from PLC:', data.toString());
-                const status = data.toString().split("T", 2)[1]?.substring(0, 2) || "00";
-                const response = getStatusT(status);
-                console.log('Status:', response);
-                socket.write(response);
+            plcs.push({
+                id: socket.remotePort!
             });
 
+
             socket.on('close', () => {
-                console.log('❌ PLC Disconnected');
-                client = null;
+                console.log('❌ PLC Socket Closed');
+                const index = plcs.findIndex(x => x.id == socket.remotePort)
+                plcs.slice(index, 1)
             });
 
             socket.on('error', (err) => {
@@ -51,7 +52,12 @@ function plcServer() {
         server.on('error', (err) => {
             console.log('⚠️ Server Error:', err.message);
         });
+
+        server.on('close', () => {
+            console.log('🛑 Server Closed');
+        });
     }
+
 
     function sendToPLC(data: string) {
         if (!client) {
@@ -64,7 +70,8 @@ function plcServer() {
 
     return {
         startPlcServer,
-        sendToPLC
+        sendToPLC,
+        getNumberOfPlc
     };
 }
 
